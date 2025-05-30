@@ -1,7 +1,12 @@
 import "./index.css";
+import DrawingBoard from "./components/DrawingBoard";
 
 function App() {
-  return <h1>AhahhhhhH</h1>;
+  return (
+    <div className="flex items-center justify-center min-h-screen">
+      <DrawingBoard />
+    </div>
+  );
 }
 
 export default App;
