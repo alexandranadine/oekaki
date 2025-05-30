@@ -1,40 +1,57 @@
-import React, { useRef, useState } from "react";
+import React, { useRef, useState, useEffect } from "react";
 
 function DrawingBoard() {
-  const canvasRef = useRef(null); // Reference to the canvas DOM element
-  const [drawing, setDrawing] = useState(false); // Tracks whether the user is currently drawing
+  const canvasRef = useRef(null);
+  const [drawing, setDrawing] = useState(false);
 
-  // Called when the user presses the mouse button down on the canvas
-  // Starts the drawing process and draws the initial point
+  const gridSize = 10; // Size of each grid square in pixels
+
+  // Draw a grid on the canvas background
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    const ctx = canvas.getContext("2d");
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    // Draw grid
+    ctx.strokeStyle = "#eee";
+    ctx.lineWidth = 1;
+    for (let x = 0; x <= canvas.width; x += gridSize) {
+      ctx.beginPath();
+      ctx.moveTo(x, 0);
+      ctx.lineTo(x, canvas.height);
+      ctx.stroke();
+    }
+    for (let y = 0; y <= canvas.height; y += gridSize) {
+      ctx.beginPath();
+      ctx.moveTo(0, y);
+      ctx.lineTo(canvas.width, y);
+      ctx.stroke();
+    }
+  }, []);
+
+  // Start drawing
   const startDrawing = (e) => {
     setDrawing(true);
     draw(e);
   };
 
-  // Called when the user releases the mouse button or moves the mouse out of the canvas
-  // Ends the drawing process and resets the drawing path
+  // Stop drawing
   const endDrawing = () => {
     setDrawing(false);
-    const ctx = canvasRef.current.getContext("2d");
-    ctx.beginPath();
   };
 
-  // Called whenever the mouse moves over the canvas
-  // Draws a line to the current mouse position if drawing is active
+  // Draw a filled grid square at mouse position
   const draw = (e) => {
     if (!drawing) return;
     const canvas = canvasRef.current;
     const ctx = canvas.getContext("2d");
+    ctx.imageSmoothingEnabled = false;
     const rect = canvas.getBoundingClientRect();
-    ctx.lineWidth = 2;
-    ctx.lineCap = "round";
-    ctx.strokeStyle = "#222";
-    // Draw a line to the current mouse position
-    ctx.lineTo(e.clientX - rect.left, e.clientY - rect.top);
-    ctx.stroke();
-    // Start a new path at the current mouse position
-    ctx.beginPath();
-    ctx.moveTo(e.clientX - rect.left, e.clientY - rect.top);
+    // Snap to grid
+    const x = Math.floor((e.clientX - rect.left) / gridSize) * gridSize;
+    const y = Math.floor((e.clientY - rect.top) / gridSize) * gridSize;
+    ctx.fillStyle = "#222";
+    ctx.fillRect(x, y, gridSize, gridSize); // Fill the entire grid square
   };
 
   return (
