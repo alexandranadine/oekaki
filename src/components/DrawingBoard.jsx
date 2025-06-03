@@ -1,20 +1,22 @@
 import React, { useRef, useState, useEffect } from "react";
 
-function DrawingBoard() {
+function DrawingBoard({ lineColor, lineSize }) {
   const canvasRef = useRef(null);
   const [drawing, setDrawing] = useState(false);
   const [lastPos, setLastPos] = useState(null);
 
-  const gridSize = 10; // Size of each grid square in pixels
+  const gridSize = lineSize; // Use the current lineSize as gridSize
 
-  // Draw a grid on the canvas background
+  // Draw a white background and a light grey grid on the canvas
   useEffect(() => {
     const canvas = canvasRef.current;
     const ctx = canvas.getContext("2d");
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    // Fill background with white
+    ctx.fillStyle = "#fff";
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-    // Draw grid
-    ctx.strokeStyle = "#eee";
+    // Draw grid with light grey lines
+    ctx.strokeStyle = "#e5e7eb"; // Tailwind's zinc-200
     ctx.lineWidth = 1;
     for (let x = 0; x <= canvas.width; x += gridSize) {
       ctx.beginPath();
@@ -28,7 +30,7 @@ function DrawingBoard() {
       ctx.lineTo(canvas.width, y);
       ctx.stroke();
     }
-  }, []);
+  }, [gridSize]);
 
   // Start drawing
   const startDrawing = (e) => {
@@ -46,13 +48,13 @@ function DrawingBoard() {
     setLastPos(null);
   };
 
-  // Fill a grid square at (x, y)
+  // Fill a grid square at (x, y) with the selected color and size
   const fillSquare = (x, y) => {
     const canvas = canvasRef.current;
     const ctx = canvas.getContext("2d");
     ctx.imageSmoothingEnabled = false;
-    ctx.fillStyle = "#222";
-    ctx.fillRect(x, y, gridSize, gridSize);
+    ctx.fillStyle = lineColor; // Use selected color
+    ctx.fillRect(x, y, gridSize, gridSize); // Use selected size
   };
 
   // Draw a filled grid square at mouse position, interpolating if needed
